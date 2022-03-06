@@ -1,0 +1,65 @@
+edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: framework #  项目名称
+access: default #  秘钥别名
+
+services:
+  framework: # 业务名称/模块名称
+    component: fc # 组件名称
+    actions:
+      pre-deploy:
+        - run: unzip ./node_modules.zip -d /tmp/strapi
+          path: ./
+        - run: s nas upload -ro /tmp/strapi/ /mnt/auto/strapi
+          path: ./
+    props: # 组件的属性值
+      region: cn-shenzhen
+      service:
+        name: strapi
+        description: "Serverless Devs Web Framework Service"
+        nasConfig: auto
+        logConfig: auto
+      function:
+        name: strapi
+        description: "Serverless Devs Web Framework strapi Function"
+        # codeUri: "./code/strapi"
+        # runtime: nodejs12
+        codeUri: "./code"
+        runtime: custom
+        timeout: 30
+        memorySize: 1536
+        instanceConcurrency: 12
+        caPort: 1337
+        environmentVariables:
+          PATH: /code/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          NODE_PATH: "/mnt/auto/strapi/node_modules:/usr/local/lib/node_modules"
+          HOST: ${env.HOST}
+          PORT: ${env.PORT}
+          APP_KEYS: ${env.APP_KEYS}
+          JWT_SECRET: ${env.JWT_SECRET}
+          API_TOKEN_SALT: ${env.API_TOKEN_SALT}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+
+          REGION: ${env.REGION}
+          BUCKET: ${env.BUCKET}
+          BASE_URL: ${env.BASE_URL}
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
+              methods:
+                - GET
+                - POST
+                - PUT
+                - DELETE

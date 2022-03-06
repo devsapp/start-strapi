@@ -1,0 +1,46 @@
+Type: Application
+Name: strapi
+Provider:
+  - 阿里云
+Version: 0.0.1
+Description: 快速部署一个 strapi 框架到阿里云函数计算
+HomePage: https://github.com/devsapp/strapi
+Tags:
+  - Jamstack
+  - CMS
+Category: Jamstack
+Service:
+  OSS:
+    Authorities:
+      - 管理员权限
+Parameters:
+  type: object
+  additionalProperties: false # 不允许增加其他属性
+  required: # 必填项
+    - region
+  properties:
+    region:
+      title: 地域
+      type: string
+      default: cn-hangzhou
+      description: 创建应用所在的地区
+      enum:
+        - cn-beijing
+        - cn-hangzhou
+        - cn-shanghai
+        - cn-qingdao
+        - cn-zhangjiakou
+        - cn-huhehaote
+        - cn-shenzhen
+        - cn-chengdu
+        - cn-hongkong
+        - ap-southeast-1
+        - ap-southeast-2
+        - ap-southeast-3
+        - ap-southeast-5
+        - ap-northeast-1
+        - eu-central-1
+        - eu-west-1
+        - us-west-1
+        - us-east-1
+        - ap-south-1

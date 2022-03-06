@@ -1,5 +1,4 @@
-const http = require('http');
-const fs = require('fs');
+const core = require("@serverless-devs/core")
 
 async function preInit(inputObj) {
     console.log(`\n  ____  _                   _ 
@@ -12,11 +11,13 @@ async function preInit(inputObj) {
 }
 
 async function postInit(inputObj) {
-    console.log("下载依赖中...");
-    const file = fs.createWriteStream("node_modules.zip");
-    http.get("http://serverless-devs-app-pkg.oss-cn-beijing.aliyuncs.com/node_modules.zip", function(response) {
-        response.pipe(file);
-    });
+    console.log(`\n    下载依赖中...`);
+
+    await core.downloadRequest("http://serverless-devs-app-pkg.oss-cn-beijing.aliyuncs.com/node_modules.zip", '/tmp/strapi', {
+        extract: true,
+        strip: 1,
+      });
+
     console.log(`\n    Welcome to the start-bottle application
      This application requires to open these services: 
          FC : https://fc.console.aliyun.com/

@@ -7,8 +7,8 @@ services:
     component: fc # 组件名称
     actions:
       pre-deploy:
-        - run: unzip ./node_modules.zip -d /tmp/strapi
-          path: ./
+        # - run: unzip ./node_modules.zip -d /tmp/strapi
+        #   path: ./
         - run: s nas upload -ro /tmp/strapi/ /mnt/auto/strapi
           path: ./
     props: # 组件的属性值

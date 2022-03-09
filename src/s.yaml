@@ -6,13 +6,11 @@ services:
   framework: # 业务名称/模块名称
     component: fc # 组件名称
     actions:
-      pre-deploy:
-        # - run: unzip ./node_modules.zip -d /tmp/strapi
-        #   path: ./
-        - run: s nas upload -ro /tmp/strapi/ /mnt/auto/strapi
+      post-deploy:
+        - run: s nas upload -ro /tmp/strapi/ /mnt/auto/strapi/node_modules
           path: ./
     props: # 组件的属性值
-      region: cn-shenzhen
+      region: cn-hangzhou
       service:
         name: strapi
         description: "Serverless Devs Web Framework Service"

@@ -1,5 +1,3 @@
-const core = require("@serverless-devs/core")
-
 async function preInit(inputObj) {
     console.log(`\n  ____  _                   _ 
  / ___|| |_ _ __ __ _ _ __ (_)
@@ -11,9 +9,7 @@ async function preInit(inputObj) {
 }
 
 async function postInit(inputObj) {
-    console.log(`\n    下载依赖中...`);
-
-    await core.downloadRequest("http://serverless-devs-app-pkg.oss-cn-beijing.aliyuncs.com/node_modules.zip", '/tmp/strapi', {
+    await inputObj.downloadRequest("http://serverless-devs-app-pkg.oss-cn-beijing.aliyuncs.com/node_modules.zip", '/tmp/strapi', {
         extract: true,
         strip: 1,
       });

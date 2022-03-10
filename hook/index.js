@@ -9,6 +9,7 @@ async function preInit(inputObj) {
 }
 
 async function postInit(inputObj) {
+    await inputObj.fse.remove('/tmp/strapi');
     await inputObj.downloadRequest("http://serverless-devs-app-pkg.oss-cn-beijing.aliyuncs.com/node_modules.zip", '/tmp/strapi', {
         extract: true,
         strip: 1,

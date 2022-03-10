@@ -2,6 +2,9 @@
 # OS X
 ############################
 
+node_modules
+.cache
+.tmp
 .DS_Store
 .AppleDouble
 .LSOverride

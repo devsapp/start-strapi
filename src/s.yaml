@@ -7,7 +7,7 @@ services:
     component: fc # 组件名称
     actions:
       post-deploy:
-        - run: s nas upload -ro /tmp/strapi/ /mnt/auto/strapi/node_modules
+        - run: s nas upload -ro /tmp/strapi /mnt/auto/strapi
           path: ./
     props: # 组件的属性值
       region: cn-hangzhou
@@ -29,7 +29,7 @@ services:
         caPort: 1337
         environmentVariables:
           PATH: /code/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          NODE_PATH: "/mnt/auto/strapi/node_modules:/usr/local/lib/node_modules"
+          NODE_PATH: "/mnt/auto/strapi:/usr/local/lib/node_modules"
           HOST: ${env.HOST}
           PORT: ${env.PORT}
           APP_KEYS: ${env.APP_KEYS}

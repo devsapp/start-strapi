@@ -2,6 +2,14 @@ edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic V
 name: framework #  项目名称
 access: default #  秘钥别名
 
+vars:
+  region: cn-hangzhou
+  service:
+    name: strapi
+    description: 'Serverless Devs Web Framework Service'
+    nasConfig: auto
+    logConfig: auto
+    
 services:
   framework: # 业务名称/模块名称
     component: fc # 组件名称
@@ -10,12 +18,8 @@ services:
         - run: s nas upload -ro /tmp/strapi /mnt/auto/strapi
           path: ./
     props: # 组件的属性值
-      region: cn-hangzhou
-      service:
-        name: strapi
-        description: "Serverless Devs Web Framework Service"
-        nasConfig: auto
-        logConfig: auto
+      region: ${vars.region}
+      service: ${vars.service}
       function:
         name: strapi
         description: "Serverless Devs Web Framework strapi Function"
@@ -25,19 +29,19 @@ services:
         runtime: custom
         timeout: 30
         memorySize: 1536
-        instanceConcurrency: 12
+        instanceConcurrency: 100
         caPort: 1337
         environmentVariables:
           PATH: /code/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           NODE_PATH: "/mnt/auto/strapi:/usr/local/lib/node_modules"
           HOST: ${env.HOST}
           PORT: ${env.PORT}
+          URL: ${framework.output.url.custom_domain[0].domain}
           APP_KEYS: ${env.APP_KEYS}
           JWT_SECRET: ${env.JWT_SECRET}
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
           ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-
           REGION: ${env.REGION}
           BUCKET: ${env.BUCKET}
           BASE_URL: ${env.BASE_URL}
@@ -61,3 +65,32 @@ services:
                 - POST
                 - PUT
                 - DELETE
+
+  helper: # 辅助函数, 2 min 定时预热
+    component: fc  # 组件名称
+    actions:
+      post-deploy: 
+        - run: s helper invoke
+          path: ./
+    props: # 组件的属性值
+      region: ${vars.region}
+      service:
+        name: strapi
+      function:
+        name: keep-warm
+        description: 'Serverless Devs Web Framework Helper Function'
+        codeUri: './helper'
+        runtime: python3
+        timeout: 60
+        memorySize: 128
+        instanceConcurrency: 1
+        environmentVariables:
+          WP_URL: ${framework.output.url.custom_domain[0].domain}
+      triggers:
+        - name: timerTrigger     
+          type: timer   
+          # qualifier: LATEST    
+          config:    
+            payload: '{}'    
+            cronExpression: '@every 3m'
+            enable: true

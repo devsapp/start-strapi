@@ -2,9 +2,6 @@
 # OS X
 ############################
 
-node_modules
-.cache
-.tmp
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -12,6 +9,7 @@ Icon
 .Spotlight-V100
 .Trashes
 ._*
+.tmp
 
 
 ############################
@@ -113,4 +111,6 @@ coverage
 license.txt
 exports
 *.cache
+dist
+build
 .strapi-updater.json

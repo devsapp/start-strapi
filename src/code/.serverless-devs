@@ -1,0 +1,8 @@
+{
+  "marked-yamls": [
+    {
+      "path": "s.yaml",
+      "alias": "默认环境"
+    }
+  ]
+}

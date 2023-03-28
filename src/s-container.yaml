@@ -22,10 +22,10 @@ name: web-framework-app
 access: "default"
 
 vars: # 全局变量
-  region: "{{ region }}"
-  functionName: "{{ functionName }}"
+  region: "cn-hangzhou"
+  functionName: "strapi-demo"
   service:
-    name: "{{ serviceName }}"
+    name: "web-framework"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
 
@@ -35,13 +35,13 @@ services:
     # 只对framework进行构建：s framework build
     # 如果不带有 framework ，而是直接执行 s build，工具则会对当前Yaml下，所有和 framework 平级的业务模块（如有其他平级的模块，例如下面注释的next-function），按照一定顺序进行 build 操作
     component: fc # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
-      pre-deploy: # 在deploy之前运行
-        - run: |
-            npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
-            npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
-            SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
-          path: ./code # 执行系统命令/钩子的路径
+    # actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
+    #   pre-deploy: # 在deploy之前运行
+    #     - run: |
+    #         npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
+    #         npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
+    #         SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
+    #       path: ./code # 执行系统命令/钩子的路径
     #        - component: fc build --use-docker               # 要运行的组件，格式为【component: 组件名 命令 参数】（可以通过s cli registry search --type Component 获取组件列表）
     #        - plugin: myplugin                               # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
     #          args:                                          # 插件的参数信息
@@ -54,11 +54,12 @@ services:
       function:
         name: ${vars.functionName}
         description: 'Serverless Devs Web Framework Function'
-        codeUri: './code'
+        # codeUri: './code'
         runtime: custom-container
         timeout: 60
         caPort: 1337
         cpu: 1
+        diskSize: 512
         memorySize: 2048
         environmentVariables:
           NODE_ENV: production
@@ -73,7 +74,7 @@ services:
           TRANSFER_TOKEN_SALT: ${env.tokenSalt}
           NODE_PATH: /opt/nodejs/node_modules
         customContainerConfig:
-          image: registry-vpc.ap-southeast-1.aliyuncs.com/serverless_devs/s-action-assember:debug
+          image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v3
           accelerationType: 'Default'
       triggers:
         - name: httpTrigger
@@ -96,30 +97,30 @@ services:
                 - PUT
                 - DELETE
 
-  helper: # 辅助函数, 5 min 定时预热
-    component: fc  # 组件名称
-    actions:
-      post-deploy: 
-        - run: s helper invoke
-          path: ./
-    props: # 组件的属性值
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: _FC_keep-warm
-        description: 'Serverless Devs Web Framework Helper Function'
-        codeUri: './helper'
-        runtime: python3
-        timeout: 60
-        memorySize: 128
-        instanceConcurrency: 1
-        environmentVariables:
-          WP_URL: ${framework.output.url.custom_domain[0].domain}
-      triggers:
-        - name: timerTrigger     
-          type: timer   
-          # qualifier: LATEST    
-          config:    
-            payload: '{}'    
-            cronExpression: '@every 5m'
-            enable: true
+  # helper: # 辅助函数, 5 min 定时预热
+  #   component: fc  # 组件名称
+  #   actions:
+  #     post-deploy: 
+  #       - run: s helper invoke
+  #         path: ./
+  #   props: # 组件的属性值
+  #     region: ${vars.region}
+  #     service: ${vars.service}
+  #     function:
+  #       name: _FC_keep-warm
+  #       description: 'Serverless Devs Web Framework Helper Function'
+  #       codeUri: './helper'
+  #       runtime: python3
+  #       timeout: 60
+  #       memorySize: 128
+  #       instanceConcurrency: 1
+  #       environmentVariables:
+  #         WP_URL: ${framework.output.url.custom_domain[0].domain}
+  #     triggers:
+  #       - name: timerTrigger     
+  #         type: timer   
+  #         # qualifier: LATEST    
+  #         config:    
+  #           payload: '{}'    
+  #           cronExpression: '@every 5m'
+  #           enable: true

@@ -59,6 +59,7 @@ services:
         timeout: 60
         caPort: 1337
         cpu: 1
+        diskSize: 512
         memorySize: 2048
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2

@@ -13,4 +13,4 @@ WORKDIR /opt/app
 COPY ./ .
 RUN npm run build
 EXPOSE 1337
-CMD ["node", "server.js"]
+ENTRYPOINT ["node", "server.js"]

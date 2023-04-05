@@ -3,7 +3,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk update && apk add build-base gcc autoconf automake zlib-dev libpng-dev nasm bash vips-dev
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
-WORKDIR /opt/
+WORKDIR /home/
 COPY ./package.json ./
 ENV PATH /opt/node_modules/.bin:$PATH
 RUN npm set registry https://registry.npmmirror.com

@@ -41,7 +41,6 @@ services:
       function:
         name: ${vars.functionName}
         description: 'Serverless Devs Web Framework Function'
-        # codeUri: './code'
         runtime: custom-container
         timeout: 60
         caPort: 1337
@@ -61,7 +60,7 @@ services:
           TRANSFER_TOKEN_SALT: ${env.tokenSalt}
           NODE_PATH: /opt/nodejs/node_modules
         customContainerConfig:
-          image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v3
+          image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v4
           accelerationType: 'Default'
       triggers:
         - name: httpTrigger

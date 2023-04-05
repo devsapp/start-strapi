@@ -21,39 +21,84 @@ name: web-framework-app
 # 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
 access: "default"
 
-vars: # 全局变量
-  region: "{{ region }}"
-  functionName: "{{ functionName }}"
+vars:
+  region: "cn-hangzhou"
   service:
-    name: "{{ serviceName }}"
+    name: "strapi"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
 
 services:
-  framework: # 业务名称/模块名称
-    # 如果只想针对 framework 下面的业务进行相关操作，可以在命令行中加上 framework，例如：
-    # 只对framework进行构建：s framework build
-    # 如果不带有 framework ，而是直接执行 s build，工具则会对当前Yaml下，所有和 framework 平级的业务模块（如有其他平级的模块，例如下面注释的next-function），按照一定顺序进行 build 操作
-    component: fc # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
-      pre-deploy: # 在deploy之前运行
+  strapi-development:
+    component: fc
+    actions:
+      pre-deploy:
         - run: |
             npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
             npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
             SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
-          path: ./code # 执行系统命令/钩子的路径
-    #        - component: fc build --use-docker               # 要运行的组件，格式为【component: 组件名 命令 参数】（可以通过s cli registry search --type Component 获取组件列表）
-    #        - plugin: myplugin                               # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
-    #          args:                                          # 插件的参数信息
-    #            testKey: testValue
-    #      post-deploy: # 在deploy之后运行
-    #        - component: fc versions publish # 要运行的命令行
-    props: # 组件的属性值
-      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+          path: ./code
+    props:
+      region: ${vars.region}
       service: ${vars.service}
       function:
-        name: ${vars.functionName}
-        description: 'Serverless Devs Web Framework Function'
+        name: strapi-development
+        description: 'strapi 开发环境'
+        codeUri: './code'
+        runtime: custom
+        timeout: 60
+        caPort: 1337
+        cpu: 1
+        diskSize: 512
+        memorySize: 2048
+        layers:
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
+        environmentVariables:
+          NODE_ENV: development
+          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          API_TOKEN_SALT: ${env.tokenSalt}
+          DATABASE_FILENAME: /mnt/auto/data.db
+          APP_KEYS: ${env.appKeys}
+          PORT: '1337'
+          JWT_SECRET: ${env.jwtSecret}
+          ADMIN_JWT_SECRET: ${env.adminJwtSecret}
+          HOST: 0.0.0.0
+          DATABASE_CLIENT: sqlite
+          TRANSFER_TOKEN_SALT: ${env.tokenSalt}
+          NODE_PATH: /opt/nodejs/node_modules
+        customRuntimeConfig:
+          command:
+            - node
+            - server.js
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: '/*'
+              methods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+
+  strapi-production:
+    component: fc
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: strapi-production
+        description: 'strapi 生产环境'
         codeUri: './code'
         runtime: custom
         timeout: 60
@@ -101,13 +146,13 @@ services:
                 - PUT
                 - DELETE
 
-  helper: # 辅助函数, 5 min 定时预热
-    component: fc  # 组件名称
+  helper:
+    component: fc 
     actions:
       post-deploy: 
         - run: s helper invoke
           path: ./
-    props: # 组件的属性值
+    props:
       region: ${vars.region}
       service: ${vars.service}
       function:
@@ -123,7 +168,6 @@ services:
       triggers:
         - name: timerTrigger     
           type: timer   
-          # qualifier: LATEST    
           config:    
             payload: '{}'    
             cronExpression: '@every 5m'

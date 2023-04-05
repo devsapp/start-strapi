@@ -10,7 +10,7 @@ RUN npm set registry https://registry.npmmirror.com
 RUN npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
 RUN npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
 RUN npm config set network-timeout 600000 -g && npm install
-WORKDIR /opt/app
+WORKDIR /home/app
 COPY ./ .
 RUN npm run build
 EXPOSE 1337

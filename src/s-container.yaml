@@ -1,45 +1,22 @@
-# ------------------------------------
-#   If you need English case, you can refer to [s_en.yaml] file
-# ------------------------------------
-#   欢迎您使用阿里云函数计算 FC 组件进行项目开发
-#   组件仓库地址：https://github.com/devsapp/fc
-#   组件帮助文档：https://www.serverless-devs.com/fc/readme
-#   Yaml参考文档：https://www.serverless-devs.com/fc/yaml/readme
-#   关于：
-#      - Serverless Devs和FC组件的关系、如何声明/部署多个函数、超过50M的代码包如何部署
-#      - 关于.fcignore使用方法、工具中.s目录是做什么、函数进行build操作之后如何处理build的产物
-#   等问题，可以参考文档：https://www.serverless-devs.com/fc/tips
-#   关于如何做CICD等问题，可以参考：https://www.serverless-devs.com/serverless-devs/cicd
-#   关于如何进行环境划分等问题，可以参考：https://www.serverless-devs.com/serverless-devs/extend
-#   更多函数计算案例，可参考：https://github.com/devsapp/awesome/
-#   有问题快来钉钉群问一下吧：33947367
-# ------------------------------------
 edition: 1.0.0
 name: web-framework-app
-# access 是当前应用所需要的密钥信息配置：
-# 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
-# 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
 access: "default"
 
-vars: # 全局变量
+vars:
   region: "cn-hangzhou"
-  functionName: "strapi-demo"
   service:
-    name: "web-framework"
+    name: "strapi"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
 
 services:
-  framework: # 业务名称/模块名称
-    # 如果只想针对 framework 下面的业务进行相关操作，可以在命令行中加上 framework，例如：
-    # 只对framework进行构建：s framework build
-    # 如果不带有 framework ，而是直接执行 s build，工具则会对当前Yaml下，所有和 framework 平级的业务模块（如有其他平级的模块，例如下面注释的next-function），按照一定顺序进行 build 操作
-    component: fc # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    props: # 组件的属性值
-      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+  strapi-image-production:
+    component: fc
+    props:
+      region: ${vars.region}
       service: ${vars.service}
       function:
-        name: ${vars.functionName}
+        name: strapi-image-production
         description: 'Serverless Devs Web Framework Function'
         runtime: custom-container
         timeout: 60
@@ -49,15 +26,15 @@ services:
         memorySize: 2048
         environmentVariables:
           NODE_ENV: production
-          API_TOKEN_SALT: ${env.tokenSalt}
+          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          API_TOKEN_SALT: ${env.API_TOKEN_SALT}
           DATABASE_FILENAME: /mnt/auto/data.db
-          APP_KEYS: ${env.appKeys}
+          APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
-          JWT_SECRET: ${env.jwtSecret}
-          ADMIN_JWT_SECRET: ${env.adminJwtSecret}
+          ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
-          TRANSFER_TOKEN_SALT: ${env.tokenSalt}
+          TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
           NODE_PATH: /opt/nodejs/node_modules
         customContainerConfig:
           image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v4
@@ -82,31 +59,3 @@ services:
                 - POST
                 - PUT
                 - DELETE
-
-  # helper: # 辅助函数, 5 min 定时预热
-  #   component: fc  # 组件名称
-  #   actions:
-  #     post-deploy: 
-  #       - run: s helper invoke
-  #         path: ./
-  #   props: # 组件的属性值
-  #     region: ${vars.region}
-  #     service: ${vars.service}
-  #     function:
-  #       name: _FC_keep-warm
-  #       description: 'Serverless Devs Web Framework Helper Function'
-  #       codeUri: './helper'
-  #       runtime: python3
-  #       timeout: 60
-  #       memorySize: 128
-  #       instanceConcurrency: 1
-  #       environmentVariables:
-  #         WP_URL: ${framework.output.url.custom_domain[0].domain}
-  #     triggers:
-  #       - name: timerTrigger     
-  #         type: timer   
-  #         # qualifier: LATEST    
-  #         config:    
-  #           payload: '{}'    
-  #           cronExpression: '@every 5m'
-  #           enable: true

@@ -16,9 +16,6 @@
 # ------------------------------------
 edition: 1.0.0
 name: web-framework-app
-# access 是当前应用所需要的密钥信息配置：
-# 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
-# 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
 access: "default"
 
 vars:
@@ -56,15 +53,14 @@ services:
         environmentVariables:
           NODE_ENV: development
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          API_TOKEN_SALT: ${env.tokenSalt}
-          DATABASE_FILENAME: /mnt/auto/data.db
-          APP_KEYS: ${env.appKeys}
+          API_TOKEN_SALT: ${env.API_TOKEN_SALT}
+          DATABASE_FILENAME: .tmp/data.db
+          APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
-          JWT_SECRET: ${env.jwtSecret}
-          ADMIN_JWT_SECRET: ${env.adminJwtSecret}
+          ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
-          TRANSFER_TOKEN_SALT: ${env.tokenSalt}
+          TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
           NODE_PATH: /opt/nodejs/node_modules
         customRuntimeConfig:
           command:
@@ -111,15 +107,14 @@ services:
         environmentVariables:
           NODE_ENV: production
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          API_TOKEN_SALT: ${env.tokenSalt}
+          API_TOKEN_SALT: ${env.API_TOKEN_SALT}
           DATABASE_FILENAME: /mnt/auto/data.db
-          APP_KEYS: ${env.appKeys}
+          APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
-          JWT_SECRET: ${env.jwtSecret}
-          ADMIN_JWT_SECRET: ${env.adminJwtSecret}
+          ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
-          TRANSFER_TOKEN_SALT: ${env.tokenSalt}
+          TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
           NODE_PATH: /opt/nodejs/node_modules
         customRuntimeConfig:
           command:

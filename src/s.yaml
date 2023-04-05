@@ -54,7 +54,7 @@ services:
           NODE_ENV: development
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
-          DATABASE_FILENAME: .tmp/data.db
+          DATABASE_FILENAME: /mnt/auto/development/data.db
           APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
           ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
@@ -108,7 +108,7 @@ services:
           NODE_ENV: production
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
-          DATABASE_FILENAME: /mnt/auto/data.db
+          DATABASE_FILENAME: /mnt/auto/production/data.db
           APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
           ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}

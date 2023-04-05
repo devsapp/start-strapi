@@ -6,7 +6,7 @@ module.exports = ({ env }) => {
   const connections = {
     sqlite: {
       connection: {
-        filename: env('DATABASE_FILENAME', '/mnt/auto/production/data.db'),
+        filename: env('DATABASE_FILENAME', '/mnt/auto/development/data.db'),
       },
       useNullAsDefault: true,
     },

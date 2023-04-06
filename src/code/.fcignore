@@ -10,3 +10,4 @@
 ./node_modules/@types*
 ./node_modules/webpack*
 ./node_modules/@sentry*
+./src/api

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+node ./server.js
+
+npx strapi develop

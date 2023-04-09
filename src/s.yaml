@@ -5,17 +5,18 @@ access: "default"
 vars:
   region: "cn-hangzhou"
   caPort: 1337
-  sqliteNasFile: /mnt/auto/data.db
   service:
     name: "strapi"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
+    # logConfig: auto
 
 services:
   strapi-development:
     component: fc
     actions:
       pre-deploy:
+        - run: cp -f ./code/.development.fcignore ./code/.fcignore
         - run: |
             npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
             npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
@@ -33,25 +34,27 @@ services:
         caPort: ${vars.caPort}
         cpu: 1
         diskSize: 512
+        instanceConcurrency: 10
         memorySize: 2048
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
         environmentVariables:
+          STRAPI_ADMIN_BACKEND_URL: ${strapi-development.output.url.custom_domain[0].domain}
           NODE_ENV: development
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
-          DATABASE_FILENAME: ${vars.sqliteNasFile}
+          DATABASE_FILENAME: /mnt/auto/strapi/development/data.db
           APP_KEYS: ${env.APP_KEYS}
+          JWT_SECRET: ${env.JWT_SECRET}
           PORT: ${vars.caPort}
           ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
           TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
-          NODE_PATH: /opt/nodejs/node_modules
+          NODE_PATH: /code/node_modules
         customRuntimeConfig:
           command:
-            - node
-            - server.js
+            - ./bootstrap
       triggers:
         - name: httpTrigger
           type: http
@@ -61,6 +64,7 @@ services:
               - GET
               - POST
               - PUT
+              - HEAD
               - DELETE
       customDomains:
         - domainName: auto
@@ -71,10 +75,14 @@ services:
                 - GET
                 - POST
                 - PUT
+                - HEAD
                 - DELETE
 
   strapi-production:
     component: fc
+    actions:
+      pre-deploy:
+        - run: cp -f ./code/.production.fcignore ./code/.fcignore
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -83,6 +91,7 @@ services:
         description: 'strapi 生产环境'
         codeUri: './code'
         runtime: custom
+        instanceConcurrency: 10
         timeout: 60
         caPort: ${vars.caPort}
         cpu: 1
@@ -94,14 +103,15 @@ services:
           NODE_ENV: production
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
-          DATABASE_FILENAME: ${vars.sqliteNasFile}
+          DATABASE_FILENAME: /mnt/auto/strapi/production/data.db
           APP_KEYS: ${env.APP_KEYS}
+          JWT_SECRET: ${env.JWT_SECRET}
           PORT: ${vars.caPort}
           ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
           TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
-          NODE_PATH: /opt/nodejs/node_modules
+          NODE_PATH: /code/node_modules
         customRuntimeConfig:
           command:
             - node
@@ -127,29 +137,29 @@ services:
                 - PUT
                 - DELETE
 
-  helper:
-    component: fc 
-    actions:
-      post-deploy: 
-        - run: s helper invoke
-          path: ./
-    props:
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: _FC_keep-warm
-        description: 'Serverless Devs Web Framework Helper Function'
-        codeUri: './helper'
-        runtime: python3
-        timeout: 60
-        memorySize: 128
-        instanceConcurrency: 1
-        environmentVariables:
-          WP_URL: ${framework.output.url.custom_domain[0].domain}
-      triggers:
-        - name: timerTrigger     
-          type: timer   
-          config:    
-            payload: '{}'    
-            cronExpression: '@every 5m'
-            enable: true
+  # helper:
+  #   component: fc 
+  #   actions:
+  #     post-deploy: 
+  #       - run: s helper invoke
+  #         path: ./
+  #   props:
+  #     region: ${vars.region}
+  #     service: ${vars.service}
+  #     function:
+  #       name: _FC_keep-warm
+  #       description: 'Serverless Devs Web Framework Helper Function'
+  #       codeUri: './helper'
+  #       runtime: python3
+  #       timeout: 60
+  #       memorySize: 128
+  #       instanceConcurrency: 1
+  #       environmentVariables:
+  #         WP_URL: ${framework.output.url.custom_domain[0].domain}
+  #     triggers:
+  #       - name: timerTrigger     
+  #         type: timer   
+  #         config:    
+  #           payload: '{}'    
+  #           cronExpression: '@every 5m'
+  #           enable: true

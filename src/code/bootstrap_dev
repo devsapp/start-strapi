@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export NODE_ENV=local
+export NODE_PATH=$(pwd)/node_modules
+
+node ./server.js
+npx strapi develop

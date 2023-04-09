@@ -2,7 +2,7 @@
 # OS X
 ############################
 
-.serverless-devs
+./src/api
 .DS_Store
 .AppleDouble
 .LSOverride

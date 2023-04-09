@@ -1,0 +1,12 @@
+{
+  "marked-yamls": [
+    {
+      "path": "src/s-container.yaml",
+      "alias": "Docker部署"
+    },
+    {
+      "path": "src/s.yaml",
+      "alias": "默认环境"
+    }
+  ]
+}

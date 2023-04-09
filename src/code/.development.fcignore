@@ -1,0 +1,7 @@
+./.DS_Store
+./.s
+./s.yaml
+./.cache
+./.tmp
+./src/api
+./node_modules_mac

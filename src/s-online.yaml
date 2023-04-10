@@ -9,18 +9,80 @@ vars:
     name: "strapi"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
+    # logConfig: auto
 
 services:
-  strapi-production:
+  strapi-development:
     component: fc
     actions:
       pre-deploy:
-        - run: cp -f ./code/.production.fcignore ./code/.fcignore
+        - run: cp -f ./code/.development.fcignore ./code/.fcignore
         - run: |
             npm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp"
             npm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips"
             SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux --libc=glibc
           path: ./code
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: strapi-development
+        description: 'strapi 开发环境'
+        codeUri: './code'
+        runtime: custom
+        timeout: 60
+        caPort: ${vars.caPort}
+        cpu: 1
+        diskSize: 512
+        instanceConcurrency: 10
+        memorySize: 2048
+        layers:
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
+        environmentVariables:
+          STRAPI_ADMIN_BACKEND_URL: ${strapi-development.output.url.custom_domain[0].domain}
+          NODE_ENV: development
+          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          API_TOKEN_SALT: ${env.API_TOKEN_SALT}
+          DATABASE_FILENAME: /mnt/auto/strapi/development/data.db
+          APP_KEYS: ${env.APP_KEYS}
+          JWT_SECRET: ${env.JWT_SECRET}
+          PORT: ${vars.caPort}
+          ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
+          HOST: 0.0.0.0
+          DATABASE_CLIENT: sqlite
+          TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
+          NODE_PATH: /code/node_modules
+        customRuntimeConfig:
+          command:
+            - ./bootstrap_online
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - HEAD
+              - DELETE
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: '/*'
+              methods:
+                - GET
+                - POST
+                - PUT
+                - HEAD
+                - DELETE
+
+  strapi-production:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: cp -f ./code/.production.fcignore ./code/.fcignore
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -53,7 +115,7 @@ services:
         customRuntimeConfig:
           command:
             - node
-            - server.js
+            - server_online.js
       triggers:
         - name: httpTrigger
           type: http

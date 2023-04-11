@@ -29,15 +29,15 @@ services:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           API_TOKEN_SALT: ${env.API_TOKEN_SALT}
           DATABASE_FILENAME: /mnt/auto/strapi/data.db
-          APP_KEYS: ${env.APP_KEYS}
           PORT: '1337'
+          APP_KEYS: ${env.APP_KEYS}
+          JWT_SECRET: ${env.JWT_SECRET}
           ADMIN_JWT_SECRET: ${env.ADMIN_JWT_SECRET}
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
           TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
-          NODE_PATH: /opt/nodejs/node_modules
         customContainerConfig:
-          image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v4
+          image: registry.cn-hangzhou.aliyuncs.com/aliwarefed/start-strapi:v3
           accelerationType: 'Default'
       triggers:
         - name: httpTrigger

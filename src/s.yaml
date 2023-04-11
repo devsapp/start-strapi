@@ -49,7 +49,6 @@ services:
           HOST: 0.0.0.0
           DATABASE_CLIENT: sqlite
           TRANSFER_TOKEN_SALT: ${env.TRANSFER_TOKEN_SALT}
-          NODE_PATH: /code/node_modules
         customRuntimeConfig:
           command:
             - node

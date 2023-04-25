@@ -6,12 +6,12 @@ vars:
   region: "cn-hangzhou"
   caPort: 1337
   service:
-    name: "strapi"
+    name: "start-strapi"
     description: 'Serverless Devs Web Framework Service'
     nasConfig: auto
 
 services:
-  strapi-production:
+  strapiService:
     component: fc
     actions:
       pre-deploy:
@@ -25,7 +25,7 @@ services:
       region: ${vars.region}
       service: ${vars.service}
       function:
-        name: strapi-production
+        name: strapi
         description: 'strapi 生产环境'
         codeUri: './code'
         runtime: custom
@@ -76,29 +76,29 @@ services:
                 - HEAD
                 - DELETE
 
-  # helper:
-  #   component: fc 
-  #   actions:
-  #     post-deploy: 
-  #       - run: s helper invoke
-  #         path: ./
-  #   props:
-  #     region: ${vars.region}
-  #     service: ${vars.service}
-  #     function:
-  #       name: _FC_keep-warm
-  #       description: 'Serverless Devs Web Framework Helper Function'
-  #       codeUri: './helper'
-  #       runtime: python3
-  #       timeout: 60
-  #       memorySize: 128
-  #       instanceConcurrency: 1
-  #       environmentVariables:
-  #         WP_URL: ${framework.output.url.custom_domain[0].domain}
-  #     triggers:
-  #       - name: timerTrigger     
-  #         type: timer   
-  #         config:    
-  #           payload: '{}'    
-  #           cronExpression: '@every 5m'
-  #           enable: true
+  helper:
+    component: fc 
+    actions:
+      post-deploy: 
+        - run: s helper invoke
+          path: ./
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: _FC_keep-warm
+        description: 'Serverless Devs Web Framework Helper Function'
+        codeUri: './helper'
+        runtime: python3
+        timeout: 60
+        memorySize: 128
+        instanceConcurrency: 1
+        environmentVariables:
+          WP_URL: ${framework.strapiService.url.custom_domain[0].domain}
+      triggers:
+        - name: timerTrigger     
+          type: timer   
+          config:    
+            payload: '{}'    
+            cronExpression: '@every 4m'
+            enable: true

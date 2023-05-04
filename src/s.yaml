@@ -94,7 +94,7 @@ services:
         memorySize: 128
         instanceConcurrency: 1
         environmentVariables:
-          WP_URL: ${framework.strapiService.url.custom_domain[0].domain}
+          WP_URL: ${framework.output.url.system_url}
       triggers:
         - name: timerTrigger     
           type: timer   
